@@ -8,7 +8,7 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
 
   // Coverage thresholds
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
       branches: 70,
       functions: 70,
@@ -29,8 +29,15 @@ module.exports = {
 
   // Test match patterns
   testMatch: [
-    '**/tests/**/*.test.js',
-    '**/tests/**/*.spec.js'
+    '**/tests/unit/**/*.test.js',
+    '**/tests/integration/**/*.test.js',
+    '**/tests/**/*.test.js'
+  ],
+
+  // Ignore E2E tests (run with Playwright)
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/e2e/'
   ],
 
   // Setup files
