@@ -1,18 +1,51 @@
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 6000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Security headers
+app.use(helmet());
+
+// CORS — restrict to same-origin by default; override via CORS_ORIGIN env var
+const allowedOrigin = process.env.CORS_ORIGIN || false;
+app.use(cors({
+  origin: allowedOrigin,
+  credentials: false
+}));
+
+// Rate limiting
+const defaultLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' }
+});
+app.use(defaultLimiter);
+
+app.use(express.json({ limit: '50kb' }));
 app.use(express.static('public'));
 
-// SFS Service Registry
+// Admin API key middleware
+function requireAdminKey(req, res, next) {
+  const adminKey = process.env.ADMIN_API_KEY;
+  if (!adminKey) {
+    return res.status(503).json({ error: 'Admin access not configured' });
+  }
+  const providedKey = req.headers['x-admin-key'] || req.query.key;
+  if (!providedKey || providedKey !== adminKey) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}
+
+// SFS Service Registry — URLs come from env vars, no hardcoded fallbacks leak to client
 const SFS_SERVICES = [
   {
     name: 'SmartFlowSite',
@@ -86,40 +119,40 @@ const SFS_SERVICES = [
   }
 ];
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ ok: true, service: 'sfs-control-center', timestamp: new Date().toISOString() });
+// Health check
+app.get('/health', (_req, res) => {
+  res.json({ ok: true });
 });
 
-// Get all services status
-app.get('/api/services/status', async (req, res) => {
+// Services status — admin only (exposes internal URLs)
+app.get('/api/services/status', requireAdminKey, async (_req, res) => {
   try {
     const statusPromises = SFS_SERVICES.map(async (service) => {
       try {
         const healthUrl = `${service.url}/health`;
         const response = await fetch(healthUrl, { timeout: 5000 });
         const data = await response.json();
-
         return {
-          ...service,
+          name: service.name,
+          category: service.category,
+          description: service.description,
           status: 'online',
           healthy: data.ok === true,
-          responseTime: response.headers.get('x-response-time') || 'N/A',
           lastChecked: new Date().toISOString()
         };
-      } catch (error) {
+      } catch {
         return {
-          ...service,
+          name: service.name,
+          category: service.category,
+          description: service.description,
           status: 'offline',
           healthy: false,
-          error: error.message,
           lastChecked: new Date().toISOString()
         };
       }
     });
 
     const results = await Promise.all(statusPromises);
-
     const summary = {
       total: results.length,
       online: results.filter(s => s.status === 'online').length,
@@ -129,48 +162,42 @@ app.get('/api/services/status', async (req, res) => {
 
     res.json({ services: results, summary, timestamp: new Date().toISOString() });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Status check error:', error.message);
+    res.status(500).json({ error: 'Failed to fetch service status' });
   }
 });
 
-// Get GitHub Actions status for all repos
-app.get('/api/deployments/status', async (req, res) => {
-  try {
-    // This would integrate with GitHub API to get workflow status
-    // For now, return placeholder
-    res.json({
-      message: 'GitHub Actions integration coming soon',
-      repos: SFS_SERVICES.map(s => s.repo)
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+// Deployments status — admin only
+app.get('/api/deployments/status', requireAdminKey, (_req, res) => {
+  res.json({
+    message: 'GitHub Actions integration coming soon',
+    count: SFS_SERVICES.length
+  });
 });
 
-// Get aggregate metrics
-app.get('/api/metrics/aggregate', async (req, res) => {
-  try {
-    // Placeholder for aggregate metrics
-    res.json({
-      totalUsers: 0,
-      totalRevenue: 0,
-      activeDeployments: SFS_SERVICES.length,
-      avgResponseTime: '150ms',
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+// Aggregate metrics — admin only
+app.get('/api/metrics/aggregate', requireAdminKey, (_req, res) => {
+  res.json({
+    totalUsers: 0,
+    totalRevenue: 0,
+    activeDeployments: SFS_SERVICES.length,
+    avgResponseTime: '150ms',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Serve the dashboard
-app.get('/', (req, res) => {
+// Serve dashboard
+app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
+// Global error handler
+app.use((err, _req, res, _next) => {
+  console.error('Unhandled error:', err.message);
+  res.status(err.status || 500).json({ error: 'Internal server error' });
+});
+
 app.listen(PORT, () => {
-  console.log(`🎯 SFS Control Center running on port ${PORT}`);
-  console.log(`📊 Monitoring ${SFS_SERVICES.length} services`);
-  console.log(`🌐 Open http://localhost:${PORT}`);
+  console.log(`SFS Control Center running on port ${PORT}`);
+  console.log(`Monitoring ${SFS_SERVICES.length} services`);
 });

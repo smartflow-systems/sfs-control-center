@@ -348,10 +348,16 @@
                 document.getElementById('last-updated').textContent = `Last updated: ${now}`;
 
             } catch (error) {
-                console.error('Error loading service status:', error);
-                document.getElementById('services-container').innerHTML =
-                    `<div class="loading" style="color: #ff0000;">Error loading services: ${error.message}</div>`;
+                console.error('Error loading service status');
+                const errContainer = document.getElementById('services-container');
+                errContainer.textContent = 'Error loading services. Please try again.';
             }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(String(str)));
+            return div.innerHTML;
         }
 
         function createServiceCard(service) {
@@ -360,22 +366,34 @@
 
             const statusClass = service.status === 'online' ? 'status-online' : 'status-offline';
 
-            card.innerHTML = `
-                <div class="service-header">
-                    <div class="service-name">${service.name}</div>
-                    <div class="status-indicator ${statusClass}"></div>
-                </div>
-                <div class="service-category">${service.category}</div>
-                <div class="service-description">${service.description}</div>
-                <div style="color: var(--sfs-beige); font-size: 0.85em; opacity: 0.7;">
-                    Status: ${service.status.toUpperCase()}
-                    ${service.healthy ? '✓ Healthy' : '✗ Unhealthy'}
-                </div>
-                <div class="service-actions">
-                    <a href="${service.url}" target="_blank" class="btn btn-primary">Open</a>
-                    <a href="https://github.com/${service.repo}" target="_blank" class="btn">GitHub</a>
-                </div>
-            `;
+            const header = document.createElement('div');
+            header.className = 'service-header';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'service-name';
+            nameEl.textContent = service.name;
+
+            const statusIndicator = document.createElement('div');
+            statusIndicator.className = `status-indicator ${statusClass}`;
+            header.appendChild(nameEl);
+            header.appendChild(statusIndicator);
+
+            const categoryEl = document.createElement('div');
+            categoryEl.className = 'service-category';
+            categoryEl.textContent = service.category;
+
+            const descEl = document.createElement('div');
+            descEl.className = 'service-description';
+            descEl.textContent = service.description;
+
+            const statusText = document.createElement('div');
+            statusText.style.cssText = 'color: var(--sfs-beige); font-size: 0.85em; opacity: 0.7;';
+            statusText.textContent = `Status: ${service.status.toUpperCase()} ${service.healthy ? '✓ Healthy' : '✗ Unhealthy'}`;
+
+            card.appendChild(header);
+            card.appendChild(categoryEl);
+            card.appendChild(descEl);
+            card.appendChild(statusText);
 
             return card;
         }
