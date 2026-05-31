@@ -7,7 +7,7 @@
     "dev": "node server.js",
     "start": "node server.js",
     "build": "echo 'Build complete'",
-    "health": "node scripts/health.sh",
+    "health": "bash scripts/health.sh",
     "test": "jest",
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",

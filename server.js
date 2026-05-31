@@ -51,71 +51,64 @@ const SFS_SERVICES = [
     name: 'SmartFlowSite',
     url: process.env.SMARTFLOWSITE_URL || 'https://smartflowsite.replit.app',
     repo: 'smartflow-systems/SmartFlowSite',
-    description: 'Main marketing & landing site',
-    category: 'Core Platform'
+    description: 'Main SmartFlow Systems site',
+    category: 'Core'
   },
   {
-    name: 'Marketing & Growth',
-    url: process.env.SFS_MARKETING_URL || 'https://sfs-marketing-and-growth.replit.app',
-    repo: 'smartflow-systems/sfs-marketing-and-growth',
-    description: 'Booking & marketing automation',
-    category: 'Marketing'
+    name: 'SFS Backend',
+    url: process.env.SFS_BACKEND_URL || 'https://sfs-backend.replit.app',
+    repo: 'smartflow-systems/SFS-Backend',
+    description: 'Core backend API',
+    category: 'Core'
   },
   {
-    name: 'Data Query Engine',
-    url: process.env.SFS_DATA_QUERY_URL || 'https://sfsdataqueryengine.replit.app',
-    repo: 'smartflow-systems/SFSDataQueryEngine',
-    description: 'Natural language SQL queries',
-    category: 'Data & Analytics'
+    name: 'Status Page',
+    url: process.env.SFS_STATUS_PAGE_URL || 'https://sfs-status-page.replit.app',
+    repo: 'smartflow-systems/sfs-status-page',
+    description: 'Uptime and incident status platform',
+    category: 'Operations'
   },
   {
-    name: 'Social Scale Booster AI',
-    url: process.env.SOCIAL_AI_URL || 'https://socialscaleboosteraibot.replit.app',
-    repo: 'smartflow-systems/SocialScaleBoosterAIbot',
-    description: 'AI social media bot builder',
-    category: 'Social Media'
-  },
-  {
-    name: 'CRM Demo',
-    url: process.env.SFS_CRM_URL || 'https://sfsapdemocrm.replit.app',
-    repo: 'smartflow-systems/SFSAPDemoCRM',
-    description: 'Customer relationship management',
-    category: 'Business Management'
-  },
-  {
-    name: 'Data Scrape Insights',
-    url: process.env.DATA_SCRAPE_URL || 'https://datascrapeinsights.replit.app',
-    repo: 'smartflow-systems/DataScrapeInsights',
-    description: 'Web scraping & analysis',
-    category: 'Data & Analytics'
-  },
-  {
-    name: 'Social Scale Booster',
+    name: 'SocialScaleBooster',
     url: process.env.SOCIAL_BOOSTER_URL || 'https://socialscalebooster.replit.app',
     repo: 'smartflow-systems/SocialScaleBooster',
     description: 'Social media automation',
     category: 'Social Media'
   },
   {
+    name: 'SocialScaleBooster AIbot',
+    url: process.env.SOCIAL_AI_URL || 'https://socialscaleboosteraibot.replit.app',
+    repo: 'smartflow-systems/SocialScaleBoosterAIbot',
+    description: 'AI social bot platform',
+    category: 'Social Media'
+  },
+  {
     name: 'Barber Booker',
     url: process.env.BARBER_BOOKER_URL || 'https://barber-booker.replit.app',
-    repo: 'smartflow-systems/Barber-booker-tempate-v1',
-    description: 'Service booking system',
-    category: 'Business Management'
+    repo: 'smartflow-systems/Barber-booker-v1',
+    description: 'Salon and barber booking template',
+    category: 'Products'
   },
   {
-    name: 'Website Builder',
-    url: process.env.WEBSITE_BUILDER_URL || 'https://websitebuilder.replit.app',
-    repo: 'smartflow-systems/WebsiteBuilder',
-    description: 'Website builder platform',
-    category: 'Content & Media'
+    name: 'DataScrapeInsights',
+    url: process.env.DATA_SCRAPE_URL || 'https://datascrapeinsights.replit.app',
+    repo: 'smartflow-systems/DataScrapeInsights',
+    description: 'Scraping and AI data analysis dashboard',
+    category: 'Analytics'
   },
   {
-    name: 'CodeGPT',
-    url: process.env.CODEGPT_URL || 'https://codegpt.replit.app',
-    repo: 'smartflow-systems/codegpt',
-    description: 'AI code assistant showcase',
-    category: 'Developer Tools'
+    name: 'SFS Embed SDK',
+    url: process.env.SFS_EMBED_SDK_URL || 'https://sfs-embed-sdk.replit.app',
+    repo: 'smartflow-systems/sfs-embed-sdk',
+    description: 'Embeddable widgets SDK',
+    category: 'SDK'
+  },
+  {
+    name: 'SFS URL Shortener',
+    url: process.env.SFS_URL_SHORTENER_URL || 'https://sfs-url-shortener.replit.app',
+    repo: 'smartflow-systems/sfs-url-shortener',
+    description: 'Short links and click analytics',
+    category: 'Products'
   }
 ];
 
